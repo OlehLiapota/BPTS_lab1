@@ -1,7 +1,7 @@
 public class Main {
 
     public static void main(String[] args) {
-        DES des = new DES();
-        byte[][] subKeys = des.keyToSubKeys("IEOFIT#1");
+        KeyGeneration keyGeneration = new KeyGeneration();
+        byte[][] subKeys = keyGeneration.keyToSubKeys("IEOFIT#");
     }
 }
