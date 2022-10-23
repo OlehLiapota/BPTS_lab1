@@ -6,15 +6,15 @@ public class DES {
     private final int[] subKeyOrder = {14,17,11,24,1,5,3,28,15,6,21,10,23,19,12,4,26,8,16,7,27,
             20,13,2,41,52,31,37,47,55,30,40,51,45,33,48,44,49,39,56,34,53,46,42,50,36,29,32};
 
-    public int[][] keyToSubKeys(String key) {
+    public byte[][] keyToSubKeys(String key) {
         String hexKey = keyToHex(key);
         String binaryKey = hexToBinary(hexKey);
-        int[][] rearrangedKey = rearrangeKey(binaryKey);
+        byte[][] rearrangedKey = rearrangeKey(binaryKey);
         return generateSubKeys(rearrangedKey);
     }
 
-    private int[][] generateSubKeys(int[][] rearrangedKey) {
-        int[][] subKeys = new int[leftShiftNumber.length][subKeyOrder.length];
+    private byte[][] generateSubKeys(byte[][] rearrangedKey) {
+        byte[][] subKeys = new byte[leftShiftNumber.length][subKeyOrder.length];
         for (int i = 0; i < leftShiftNumber.length; i++) {
             rearrangedKey[0] = leftShift(rearrangedKey[0], leftShiftNumber[i]);
             rearrangedKey[1] = leftShift(rearrangedKey[1], leftShiftNumber[i]);
@@ -23,8 +23,8 @@ public class DES {
         return subKeys;
     }
 
-    private int[] rearrangeSubKey(int[] leftPartKey, int[] rightPartKey) {
-        int[] subKey = new int[subKeyOrder.length];
+    private byte[] rearrangeSubKey(byte[] leftPartKey, byte[] rightPartKey) {
+        byte[] subKey = new byte[subKeyOrder.length];
         for (int i = 0; i < subKeyOrder.length; i++) {
             if (subKeyOrder[i] > leftPartKey.length) {
                 subKey[i] = rightPartKey[subKeyOrder[i] - leftPartKey.length - 1];
@@ -35,8 +35,8 @@ public class DES {
         return subKey;
     }
 
-    private int[] leftShift(int[] planePartKey, int numberOfShifts){
-        int[] resultPartKey = new int[planePartKey.length];
+    private byte[] leftShift(byte[] planePartKey, int numberOfShifts){
+        byte[] resultPartKey = new byte[planePartKey.length];
         System.arraycopy(planePartKey, 1, resultPartKey, 0, planePartKey.length - 1);
         resultPartKey[resultPartKey.length - 1] = planePartKey[0];
         if (numberOfShifts > 1) {
@@ -46,11 +46,11 @@ public class DES {
         }
     }
 
-    private int[][] rearrangeKey(String binaryKey) {
-        int[][] rearrangedKey = {new int[leftKeyPartOrder.length], new int[rightKeyPartOrder.length]};
+    private byte[][] rearrangeKey(String binaryKey) {
+        byte[][] rearrangedKey = {new byte[leftKeyPartOrder.length], new byte[rightKeyPartOrder.length]};
         for (int i = 0; i < leftKeyPartOrder.length; i++) {
-            rearrangedKey[0][i] = Integer.parseInt(binaryKey.substring(leftKeyPartOrder[i] - 1,leftKeyPartOrder[i]));
-            rearrangedKey[1][i] = Integer.parseInt(binaryKey.substring(rightKeyPartOrder[i] - 1,rightKeyPartOrder[i]));
+            rearrangedKey[0][i] = Byte.parseByte(binaryKey.substring(leftKeyPartOrder[i] - 1,leftKeyPartOrder[i]));
+            rearrangedKey[1][i] = Byte.parseByte(binaryKey.substring(rightKeyPartOrder[i] - 1,rightKeyPartOrder[i]));
         }
         return rearrangedKey;
     }
