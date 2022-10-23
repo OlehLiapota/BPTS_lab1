@@ -1,9 +1,9 @@
 public class KeyGeneration {
     private final char normalisationSymbol = '0';
-    private final int[] leftKeyPartOrder = {57,49,41,33,25,17,9,1,58,50,42,34,26,18,10,2,59,51,43,35,27,19,11,3,60,52,44,36};
-    private final int[] rightKeyPartOrder = {63,55,47,39,31,23,15,7,62,54,46,38,30,22,14,6,61,53,45,37,29,21,13,5,28,20,12,4};
-    private final int[] leftShiftNumber = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
-    private final int[] subKeyOrder = {14,17,11,24,1,5,3,28,15,6,21,10,23,19,12,4,26,8,16,7,27,
+    private final byte[] leftKeyPartOrder = {57,49,41,33,25,17,9,1,58,50,42,34,26,18,10,2,59,51,43,35,27,19,11,3,60,52,44,36};
+    private final byte[] rightKeyPartOrder = {63,55,47,39,31,23,15,7,62,54,46,38,30,22,14,6,61,53,45,37,29,21,13,5,28,20,12,4};
+    private final byte[] leftShiftNumber = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
+    private final byte[] subKeyOrder = {14,17,11,24,1,5,3,28,15,6,21,10,23,19,12,4,26,8,16,7,27,
             20,13,2,41,52,31,37,47,55,30,40,51,45,33,48,44,49,39,56,34,53,46,42,50,36,29,32};
     private final String[] weakKeys = {"0101010101010101", "1f1f1f1f0e0e0e0e", "e0e0e0e0f1f1f1f1", "fefefefefefefefe",
             "01fe01fe01fe01fe", "fe01fe01fe01fe01", "1fe01fe00ef10ef1", "e01fe01ff10ef10e", "01e001e001f101f1",
@@ -12,16 +12,39 @@ public class KeyGeneration {
 
     public byte[][] keyToSubKeys(String key) {
         byte[][] subKeys;
-        String hexKey = keyToHex(key);
-        if (isKeyWeak(hexKey)) {
-            System.out.println("Слабкий ключ");
+        if (key.length() != 8) {
+            System.out.println("Ключ має складатись з 8 символів");
             subKeys = null;
         } else {
-            String binaryKey = hexToBinary(hexKey);
-            byte[][] rearrangedKey = rearrangeKey(binaryKey);
-            subKeys = generateSubKeys(rearrangedKey);
+            if (isKeyContainOnlyASCII(key)) {
+                String hexKey = keyToHex(key);
+                if (isKeyWeak(hexKey)) {
+                    System.out.println("Слабкий ключ");
+                    subKeys = null;
+                } else {
+                    String binaryKey = hexToBinary(hexKey);
+                    byte[][] rearrangedKey = rearrangeKey(binaryKey);
+                    subKeys = generateSubKeys(rearrangedKey);
+                }
+            }
+            else {
+                System.out.println("Можна використовувати тільки символи базової таблиці ASCII");
+                subKeys = null;
+            }
         }
         return subKeys;
+    }
+
+    private boolean isKeyContainOnlyASCII(String planeKey) {
+        boolean containOnlyASCII = true;
+        for (int i = 0; i < planeKey.length(); i++) {
+            byte maxASCIIValue = 127;
+            if ((int) planeKey.charAt(i) > maxASCIIValue) {
+                containOnlyASCII = false;
+                i = planeKey.length();
+            }
+        }
+        return containOnlyASCII;
     }
 
     private boolean isKeyWeak(String hexKey) {
