@@ -11,13 +11,16 @@ public class DES {
     private byte[] runFeistelNetwork(byte[] block, byte[][] keys) throws Exception {
         byte[] result = new byte[32];
 
+        byte[] leftPart = Arrays.copyOfRange(block, 0, 32);
+        byte[] rightPart = Arrays.copyOfRange(block, 32, 64);
         for (byte[] key: keys) {
-            byte[] leftPart = Arrays.copyOfRange(block, 0, 32);
-            byte[] rightPart= Arrays.copyOfRange(block, 32, 64);
-            //add extension for the right part
+            byte[] extendedRightPart = permutation(rightPart, Tables.extensionTable);
             //call XOR
             //add S-boxes
             //call permutation
+            byte[] t = leftPart;
+            leftPart = rightPart;
+            //rightPart = xor(t, <encrypted right part>);
 
             //add entropy calculation
         }
@@ -26,10 +29,6 @@ public class DES {
     }
 
     private byte[] permutation(byte[] block, byte[] permutationTable) throws Exception {
-        if (block.length != permutationTable.length) {
-            throw new Exception("Different lengths");
-        }
-
         byte[] result = new byte[permutationTable.length];
 
         for (int i = 0; i < permutationTable.length; i++) {
