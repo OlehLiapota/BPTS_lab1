@@ -1,11 +1,14 @@
 import java.util.ArrayList;
 
 public class MessageConverter {
-    private final int characterLength = 16;
     private final String message;
+    private final int characterLength;
+    private final int charactersPerBlock;
 
-    public MessageConverter(String message) {
+    public MessageConverter(String message, int characterLength) {
         this.message = message;
+        this.characterLength = characterLength;
+        this.charactersPerBlock = 64 / this.characterLength;
     }
 
     public ArrayList<byte[]> getBlocks() {
@@ -22,7 +25,7 @@ public class MessageConverter {
                 blockBits[blockIndex] = characterBits[j];
             }
 
-            if (charactersInBlock == 4) {
+            if (charactersInBlock == charactersPerBlock) {
                 messageBitBlocks.add(blockBits);
                 charactersInBlock = 0;
                 blockBits = new byte[64];
@@ -40,7 +43,7 @@ public class MessageConverter {
     }
 
     private byte[] getSymbolBits(char character) {
-        byte[] bits = new byte[16];
+        byte[] bits = new byte[characterLength];
 
         StringBuilder stringBuilder = new StringBuilder(Integer.toBinaryString(character));
         while (stringBuilder.length() < characterLength) {
