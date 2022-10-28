@@ -13,13 +13,13 @@ public class KeyGeneration {
     public byte[][] keyToSubKeys(String key) {
         byte[][] subKeys;
         if (key.length() != 8) {
-            System.out.println("Ключ має складатись з 8 символів");
+            System.out.println("Key must contain 8 symbols");
             subKeys = null;
         } else {
             if (isKeyContainOnlyASCII(key)) {
                 String hexKey = keyToHex(key);
                 if (isKeyWeak(hexKey)) {
-                    System.out.println("Слабкий ключ");
+                    System.out.println("Weak key");
                     subKeys = null;
                 } else {
                     String binaryKey = hexToBinary(hexKey);
@@ -28,7 +28,7 @@ public class KeyGeneration {
                 }
             }
             else {
-                System.out.println("Можна використовувати тільки символи базової таблиці ASCII");
+                System.out.println("You can use only symbols from default ASCII table");
                 subKeys = null;
             }
         }

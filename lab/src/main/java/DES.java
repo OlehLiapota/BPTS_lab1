@@ -13,7 +13,13 @@ public class DES {
 
         byte[] leftPart = Arrays.copyOfRange(block, 0, 32);
         byte[] rightPart = Arrays.copyOfRange(block, 32, 64);
+
+        int i = 0;
+
+        System.out.println("ENTROPY");
         for (byte[] key: keys) {
+            i++;
+
             byte[] extendedRightPart = permutation(rightPart, Tables.extensionTable);
             byte[] extendedRightPartXOR = xor(extendedRightPart, key);
             byte[] encodedRightPart = runSBoxes(extendedRightPartXOR);
@@ -23,8 +29,10 @@ public class DES {
             leftPart = rightPart;
             rightPart = xor(t, resultedRightPart);
 
-            // TODO: Add entropy calculation and display its value (format: <cycle number> => <entropy value>)
+            System.out.println(i + "=>" + countEntropy(leftPart, rightPart));
+            // entropy calculation and display its value (format: <cycle number> => <entropy value>)
         }
+        System.out.println("BLOCK");
 
         System.arraycopy(rightPart, 0, result, 0, rightPart.length);
         System.arraycopy(leftPart, 0, result, rightPart.length, leftPart.length);
@@ -32,7 +40,37 @@ public class DES {
         return result;
     }
 
-    private byte[] permutation(byte[] block, byte[] permutationTable) throws Exception {
+    private double countEntropy(byte[] leftArray, byte[] rightArray) {
+        double numbersOf1 = 0;
+        double numbersOf0 = 0;
+        double fullLength = leftArray.length + rightArray.length;
+
+        for (byte b : leftArray) {
+            if (b == 1) {
+                numbersOf1++;
+            } else {
+                numbersOf0++;
+            }
+        }
+
+        for (byte b : rightArray) {
+            if (b == 1) {
+                numbersOf1++;
+            } else {
+                numbersOf0++;
+            }
+        }
+
+        double entropyFunction1 = numbersOf1 / fullLength;
+        double entropyFunction0 = numbersOf0 / fullLength;
+
+        double entropyApplication1 = entropyFunction1 * (Math.log(entropyFunction1) / Math.log(2));
+        double entropyApplication0 = entropyFunction0 * (Math.log(entropyFunction0) / Math.log(2));
+
+        return -(entropyApplication1 + entropyApplication0);
+    }
+
+    private byte[] permutation(byte[] block, byte[] permutationTable) {
         byte[] result = new byte[permutationTable.length];
 
         for (int i = 0; i < permutationTable.length; i++) {
