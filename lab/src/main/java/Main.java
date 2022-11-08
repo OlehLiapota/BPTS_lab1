@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Scanner;
 
 public class Main {
 
@@ -14,55 +15,83 @@ public class Main {
     // 7. Display origin message blocks
     // 8. Display decrypted message value
     public static void main(String[] args) throws Exception {
-        String message = "Сниться мені щось дивне та далеке"; // TODO: add message reading (console)
-        int characterLength = getCharacterLength(message);
+        boolean isProgramRunning = true;
+        boolean isProgramComputing = false;
+        boolean isProgramControlling = true;
 
-        String key = "IEOFIT#1"; // TODO: Add key reading (console)
-        KeyGeneration keyGeneration = new KeyGeneration();
-        byte[][] subKeys = keyGeneration.keyToSubKeys(key);
+        while (isProgramRunning) {
+            Scanner consoleScanner= new Scanner(System.in);
 
-        while (subKeys == null) {
-            key = ""; // TODO: Add key reading (console)
-            subKeys = keyGeneration.keyToSubKeys(key);
-        }
+            while (isProgramControlling) {
+                System.out.print("Enter 'c' to compute/'q' to quit: ");
+                String control = consoleScanner.nextLine();
+                if (control.equals("c")) {
+                    isProgramComputing = true;
+                    isProgramControlling = false;
+                }
+                if (control.equals("q")) {
+                    System.out.println("Program finished");
+                    isProgramRunning = false;
+                    isProgramControlling = false;
+                }
+            }
 
-        MessageConverter messageConverter = new MessageConverter(message, characterLength);
-        ArrayList<byte[]> messageBlocks = messageConverter.getBlocks();
+            while (isProgramComputing) {
+                System.out.print("Enter message to encrypt: ");
+                String message = consoleScanner.nextLine(); // message reading (console)
+                int characterLength = getCharacterLength(message);
 
-        System.out.println("\nKeys\n");
-        displayKeys(subKeys);
+                System.out.print("Enter key (8 ASCII symbols): ");
+                String key = consoleScanner.nextLine(); // key reading (console)
+                KeyGeneration keyGeneration = new KeyGeneration();
+                byte[][] subKeys = keyGeneration.keyToSubKeys(key);
 
-        System.out.println("\nEncrypted message blocks\n");
-        DES des = new DES();
-        ArrayList<byte[]> encryptedMessageBlocks = new ArrayList<>();
-        for (byte[] messageBlock : messageBlocks) {
-            encryptedMessageBlocks.add(des.run(messageBlock, subKeys));
-        }
-        displayMessageBlocks(encryptedMessageBlocks);
-
-        System.out.println("\nDecrypted message blocks\n");
-        Collections.reverse(Arrays.asList(subKeys));
-        ArrayList<byte[]> decryptedMessageBlocks = new ArrayList<>();
-        for (byte[] encryptedMessageBlock : encryptedMessageBlocks) {
-            decryptedMessageBlocks.add(des.run(encryptedMessageBlock, subKeys));
-        }
-        displayMessageBlocks(decryptedMessageBlocks);
-
-        System.out.println("\nOrigin message blocks\n");
-        displayMessageBlocks(messageBlocks);
-
-        System.out.println("\nDecrypted message value\n");
-        for (byte[] decryptedMessageBlock : decryptedMessageBlocks) {
-            for (int i = 0; i < decryptedMessageBlock.length / characterLength; i++) {
-                StringBuilder characterBits = new StringBuilder();
-                for (int j = 0; j < characterLength; j++) {
-                    characterBits.append(decryptedMessageBlock[i * characterLength + j]);
+                while (subKeys == null) {
+                    key = consoleScanner.nextLine(); // key reading (console)
+                    subKeys = keyGeneration.keyToSubKeys(key);
                 }
 
-                int charCode = Integer.parseInt(characterBits.toString(), 2);
-                if (charCode != 0) {
-                    System.out.print((char)charCode);
+                MessageConverter messageConverter = new MessageConverter(message, characterLength);
+                ArrayList<byte[]> messageBlocks = messageConverter.getBlocks();
+
+                System.out.println("\nKeys\n");
+                displayKeys(subKeys);
+
+                System.out.println("\nEncrypted message blocks\n");
+                DES des = new DES();
+                ArrayList<byte[]> encryptedMessageBlocks = new ArrayList<>();
+                for (byte[] messageBlock : messageBlocks) {
+                    encryptedMessageBlocks.add(des.run(messageBlock, subKeys));
                 }
+                displayMessageBlocks(encryptedMessageBlocks);
+
+                System.out.println("\nDecrypted message blocks\n");
+                Collections.reverse(Arrays.asList(subKeys));
+                ArrayList<byte[]> decryptedMessageBlocks = new ArrayList<>();
+                for (byte[] encryptedMessageBlock : encryptedMessageBlocks) {
+                    decryptedMessageBlocks.add(des.run(encryptedMessageBlock, subKeys));
+                }
+                displayMessageBlocks(decryptedMessageBlocks);
+
+                System.out.println("\nOrigin message blocks\n");
+                displayMessageBlocks(messageBlocks);
+
+                System.out.println("\nDecrypted message value\n");
+                for (byte[] decryptedMessageBlock : decryptedMessageBlocks) {
+                    for (int i = 0; i < decryptedMessageBlock.length / characterLength; i++) {
+                        StringBuilder characterBits = new StringBuilder();
+                        for (int j = 0; j < characterLength; j++) {
+                            characterBits.append(decryptedMessageBlock[i * characterLength + j]);
+                        }
+
+                        int charCode = Integer.parseInt(characterBits.toString(), 2);
+                        if (charCode != 0) {
+                            System.out.print((char)charCode);
+                        }
+                    }
+                }
+                isProgramComputing = false;
+                isProgramControlling = true;
             }
         }
     }
