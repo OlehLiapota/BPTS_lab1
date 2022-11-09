@@ -28,7 +28,7 @@ public class KeyGeneration {
                 }
             }
             else {
-                System.out.println("You can use only symbols from default ASCII table");
+                System.out.println("You can use only symbols from ASCII table");
                 subKeys = null;
             }
         }
@@ -38,7 +38,7 @@ public class KeyGeneration {
     private boolean isKeyContainOnlyASCII(String planeKey) {
         boolean containOnlyASCII = true;
         for (int i = 0; i < planeKey.length(); i++) {
-            byte maxASCIIValue = 127;
+            int maxASCIIValue = 255;
             if ((int) planeKey.charAt(i) > maxASCIIValue) {
                 containOnlyASCII = false;
                 i = planeKey.length();
